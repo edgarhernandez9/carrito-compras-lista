@@ -5,3 +5,6 @@
 3- Ejecutar el proyecto (npm start)
 
 
+# Nota aplica para los dos proyectos.
+
+
