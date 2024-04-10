@@ -1,4 +1,5 @@
 const path = require('path');
+const Dotenv = require('dotenv-webpack')
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 const deps = require("./package.json").dependencies;
@@ -49,6 +50,7 @@ module.exports = () => {
         },
 
         plugins: [
+            new Dotenv(),
             new ModuleFederationPlugin({
                 name: 'carrito_compras',
                 filename: "remoteEntry.js",
