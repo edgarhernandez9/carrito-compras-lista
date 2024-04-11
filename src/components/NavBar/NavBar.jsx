@@ -1,13 +1,37 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import { Buton } from '../Buton';
 
 import '../../theme/NavBar.css'
-import { useAddProduct } from '../../hooks';
+
 
 export const NavBar = () => {
 
-    const { datosProductos } = useAddProduct();
+    const [data, setData] = useState(sessionStorage.getItem('myProducts'));
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const updateDataFromSessionStorage = () => {
+            setData(JSON.parse(sessionStorage.getItem('myProducts')));
+        };
+
+        updateDataFromSessionStorage();
+        const intervalId = setInterval(updateDataFromSessionStorage, 300);
+
+        return () => clearInterval(intervalId);
+    }, []); 
+
+    const handleClick = () => {
+        if (location.pathname === '/') {
+            navigate('/car', { state: data })
+        }else{
+            sessionStorage.removeItem('myProducts')
+            navigate('/')
+        }
+    }
+
 
     
     return (
@@ -19,10 +43,10 @@ export const NavBar = () => {
                 <li className="descripcion">Contacto</li>
             </div>
             <div className="botones">
-                <Link to={'http://localhost:3001/car'}>
+                {/* <Link to={'/car'} state={{ data }}> */}
                     <Buton
                         type="primary"
-                        name="Carrito"
+                        name={ location.pathname !== '/' ? "Home" : "Carrito"}
                         stylesBtn={{
                             backgroundColor: "#309F5A",
                             borderRadius: "13px",
@@ -32,9 +56,9 @@ export const NavBar = () => {
                             cursor: "pointer",
                         }}
                         active={ true }
-                        onClick={ () => document.cookie = `productData=${encodeURIComponent(JSON.stringify(datosProductos))}; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/`}
+                        onClick={ () => handleClick()}
                     />
-                </Link>
+                {/* </Link> */}
                 
             </div>
         </ul>

@@ -1,0 +1,1 @@
+import Car from 'carrito_compras_views/Home';

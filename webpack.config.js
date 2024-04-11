@@ -1,10 +1,10 @@
 const path = require('path');
-const Dotenv = require('dotenv-webpack')
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
+const Dotenv = require('dotenv-webpack');
 const deps = require("./package.json").dependencies;
 
-module.exports = () => {
+module.exports = (_, argv) => {
 
     return {
         entry: './src/index.js',
@@ -27,54 +27,57 @@ module.exports = () => {
         module: {
             rules: [
                 {
-                type: "javascript/auto",
-                test: /\.m?js/,
-                resolve: {
-                    fullySpecified: false,
-                },
-                },
-                {
-                use: ["style-loader", "css-loader", "postcss-loader"],
-                test: /\.(css|s[ac]ss)$/i,
+                    type: "javascript/auto",
+                    test: /\.m?js/,
+                    resolve: {
+                        fullySpecified: false,
+                    },
                 },
                 {
-                use:  "babel-loader",
-                test: /\.(ts|tsx|js|jsx)$/,
-                exclude: /node_modules/,
+                    use: ["style-loader", "css-loader", "postcss-loader"],
+                    test: /\.(css|s[ac]ss)$/i,
                 },
                 {
-                type: 'asset',
-                test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                    test: /\.(ts|tsx|js|jsx)$/,
+                    exclude: /node_modules/,
+                    use:  {
+                        loader: "babel-loader"
+                    }
+                },
+                {
+                    type: 'asset',
+                    test: /\.(png|svg|jpg|jpeg|gif)$/i,
                 },
             ],
         },
 
         plugins: [
-            new Dotenv(),
             new ModuleFederationPlugin({
                 name: 'carrito_compras',
                 filename: "remoteEntry.js",
                 remotes: {
-                    carrito_compras_views: `carrito-compras-views@http://localhost:3001/remoteEntry.js`
+                    'componentsViews': `carrito_compras_views@http://localhost:3001/remoteEntry.js`
                 },
                 exposes: {
                     "./NavBar": "./src/components/NavBar/NavBar.jsx"
                 },
-                // shared: {
-                //     ...deps,
-                //     react: {
-                //       singleton: true,
-                //       requiredVersion: deps.react,
-                //     },
-                //     "react-dom": {
-                //       singleton: true,
-                //       requiredVersion: deps["react-dom"],
-                //     },
-                // },
+                shared: {
+                    ...deps,
+                    react: {
+                        eager: true,
+                        singleton: false,
+                        requiredVersion: deps.react,
+                    },
+                    "react-dom": {
+                        singleton: true,
+                        requiredVersion: deps["react-dom"],
+                    },
+                },
             }),
             new HtmlWebPackPlugin({
               template: "./public/index.html",
             }),
+            new Dotenv(),
         ],
     }
 
