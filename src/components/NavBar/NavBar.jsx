@@ -1,17 +1,15 @@
-import React from 'react';
-import { Link, useNavigate} from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom'
 import { Buton } from '../Buton';
 
 import '../../theme/NavBar.css'
+import { useAddProduct } from '../../hooks';
 
 export const NavBar = () => {
 
-    const datosProductos = sessionStorage.getItem('myProducts');
-    const navigate = useNavigate();
+    const { datosProductos } = useAddProduct();
 
-    const baseUrl = window.location.origin;
-    const relativePath = '/car';
-
+    
     return (
         <ul className="navbar">
             <div className="navbar-options">
@@ -21,7 +19,7 @@ export const NavBar = () => {
                 <li className="descripcion">Contacto</li>
             </div>
             <div className="botones">
-                {/* <Link to={'http://localhost:3001/car'} state={{ datosProductos }}> */}
+                <Link to={'http://localhost:3001/car'}>
                     <Buton
                         type="primary"
                         name="Carrito"
@@ -34,9 +32,9 @@ export const NavBar = () => {
                             cursor: "pointer",
                         }}
                         active={ true }
-                        onClick={ () => navigate(`${relativePath}`, { state: { datosProductos } })}
+                        onClick={ () => document.cookie = `productData=${encodeURIComponent(JSON.stringify(datosProductos))}; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/`}
                     />
-                {/* </Link> */}
+                </Link>
                 
             </div>
         </ul>
